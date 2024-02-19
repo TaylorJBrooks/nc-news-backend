@@ -84,7 +84,7 @@ describe("/api/articles/:article_id", () => {
     });
     test("status: 400, should return error message when given an invalid id", () => {
       return request(app)
-        .get("/api/articles/not-a-id")
+        .get("/api/articles/not-an-id")
         .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("bad request");
@@ -122,5 +122,50 @@ describe("/api/articles", () => {
           expect(articles).toBeSortedBy("created_at", { descending: true });
         });
     });
+  });
+});
+
+describe("/api/articles/:article_id/comments", () => {
+  describe("GET", () => {
+    test("status: 200, should return all comments for the given article", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments.length).toBe(11);
+          comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+            expect(typeof comment.article_id).toBe("number");
+          });
+        });
+    });
+    test('should be sorted by default in descending order by the created_at values', () => {
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('created_at', {descending: true});
+        })
+    });
+    test("status: 404, should return error message when given a valid but non-existent article id", () => {
+        return request(app)
+          .get("/api/articles/1000/comments")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("404: article does not exist");
+          });
+      });
+    test("status: 400, should return error message when given an invalid article id", () => {
+        return request(app)
+          .get("/api/articles/not-an-id/comments")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("bad request");
+          });
+      });
   });
 });
