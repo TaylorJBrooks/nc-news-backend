@@ -54,3 +54,35 @@ describe("/api", () => {
     });
   });
 });
+
+describe("/api/articles/:article_id", () => {
+  describe("GET", () => {
+    test("status: 200, should return an article object", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article.author).toBe("butter_bridge");
+          expect(article.title).toBe("Living in the shadow of a great man");
+          expect(article.article_id).toBe(1);
+          expect(article.body).toBe("I find this existence challenging");
+          expect(article.topic).toBe("mitch");
+          expect(typeof article.created_at).toBe('string');
+          expect(article.votes).toBe(100);
+          expect(article.article_img_url).toBe(
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          );
+        });
+    });
+    test('status: 404, should return error message when given a valid but non-existent id', () => {
+        return request(app).get("/api/articles/1000").expect(404).then(({body:{msg}})=>{
+            expect(msg).toBe("article does not exist");
+        })
+    });
+    test('status: 400, should return error message when given an invalid id', () => {
+        return request(app).get("/api/articles/not-a-id").expect(400).then(({body:{msg}})=>{
+            expect(msg).toBe("bad request");
+        })
+    });
+  });
+});
