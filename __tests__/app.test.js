@@ -67,22 +67,60 @@ describe("/api/articles/:article_id", () => {
           expect(article.article_id).toBe(1);
           expect(article.body).toBe("I find this existence challenging");
           expect(article.topic).toBe("mitch");
-          expect(typeof article.created_at).toBe('string');
+          expect(typeof article.created_at).toBe("string");
           expect(article.votes).toBe(100);
           expect(article.article_img_url).toBe(
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
           );
         });
     });
-    test('status: 404, should return error message when given a valid but non-existent id', () => {
-        return request(app).get("/api/articles/1000").expect(404).then(({body:{msg}})=>{
-            expect(msg).toBe("article does not exist");
-        })
+    test("status: 404, should return error message when given a valid but non-existent id", () => {
+      return request(app)
+        .get("/api/articles/1000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("article does not exist");
+        });
     });
-    test('status: 400, should return error message when given an invalid id', () => {
-        return request(app).get("/api/articles/not-a-id").expect(400).then(({body:{msg}})=>{
-            expect(msg).toBe("bad request");
-        })
+    test("status: 400, should return error message when given an invalid id", () => {
+      return request(app)
+        .get("/api/articles/not-a-id")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("bad request");
+        });
+    });
+  });
+});
+
+describe("/api/articles", () => {
+  describe("GET", () => {
+    test("status: 200, should return an array of article objects", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(5);
+          articles.forEach((article) => {
+            expect(typeof article.author).toBe("string");
+            expect(typeof article.title).toBe("string");
+            expect(typeof article.article_id).toBe("number");
+            expect(typeof article.topic).toBe("string");
+            expect(typeof article.created_at).toBe("string");
+            expect(typeof article.votes).toBe("number");
+            expect(typeof article.article_img_url).toBe("string");
+            expect(typeof article.comment_count).toBe("number");
+            expect(article.body).toBe(undefined);
+          });
+        });
+    });
+    test("should be sorted by default in descending order by date", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
     });
   });
 });
