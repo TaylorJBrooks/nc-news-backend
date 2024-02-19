@@ -13,7 +13,7 @@ describe("unavailable path", () => {
       .get("/not-a-path")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("path not found");
+        expect(msg).toBe("404: path not found");
       });
   });
 });
@@ -79,7 +79,7 @@ describe("/api/articles/:article_id", () => {
         .get("/api/articles/1000")
         .expect(404)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("article does not exist");
+          expect(msg).toBe("404: article does not exist");
         });
     });
     test("status: 400, should return error message when given an invalid id", () => {
@@ -87,7 +87,7 @@ describe("/api/articles/:article_id", () => {
         .get("/api/articles/not-an-id")
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("bad request");
+          expect(msg).toBe("400: bad request");
         });
     });
   });
@@ -164,7 +164,7 @@ describe("/api/articles/:article_id/comments", () => {
           .get("/api/articles/not-an-id/comments")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("bad request");
+            expect(msg).toBe("400: bad request");
           });
       });
   });

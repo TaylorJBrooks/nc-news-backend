@@ -17,4 +17,9 @@ app.all('/*', pathNotFound);
 app.use(customError);
 app.use(badRequest);
 
+app.use((error, req, res, next)=>{
+    console.log(error);
+    response.status(500).send({msg: "Internal server error!"})
+})
+
 module.exports = app;

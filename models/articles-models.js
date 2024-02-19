@@ -5,7 +5,7 @@ exports.selectArticleById = (article_id) => {
         if(rows.length === 1){
             return rows[0];
         } else {
-            return Promise.reject({status: 404, msg: "article does not exist"});
+            return Promise.reject({status: 404, msg: "404: article does not exist"});
         }
     })
 };
