@@ -35,6 +35,22 @@ describe("/api/topics", () => {
   });
 });
 
+describe('/api/topics/:topic_name', () => {
+    describe('GET', () => {
+        test('status: 200, returns a topic object', () => {
+            return request(app).get('/api/topics/mitch').expect(200).then(({body:{topic}})=>{
+                expect(topic.slug).toBe('mitch')
+                expect(topic.description).toBe('The man, the Mitch, the legend')
+            })
+        });
+        test('status: 404, returns an error message when given a non-existent topic_name', () => {
+            return request(app).get('/api/topics/not-an-existing-topic').expect(404).then(({body:{msg}})=>{
+                expect(msg).toBe('404: topic does not exist')
+            })
+        });
+    });
+});
+
 describe("/api", () => {
   describe("GET", () => {
     test("status 200: should return an object detailing all available endpoints", () => {
@@ -162,7 +178,7 @@ describe("/api/articles", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(5);
+          expect(articles.length).toBe(13);
           articles.forEach((article) => {
             expect(typeof article.author).toBe("string");
             expect(typeof article.title).toBe("string");
@@ -182,6 +198,26 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body: { articles } }) => {
           expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    describe('topic query', () => {
+        test('status: 200, given a topic query should return articles of only that given topic', ()=>{
+            return request(app).get('/api/articles?topic=cats').expect(200).then(({body:{articles}})=>{
+                expect(articles.length).toBe(1)
+                articles.forEach((article)=>{
+                    expect(article.topic).toBe('cats');
+                })
+            })
+        });
+        test('status: 404, should return error message given a topic value that is not in the database', () => {
+            return request(app).get('/api/articles?topic=not-an-existing-topic').expect(404).then(({body:{msg}})=>{
+                expect(msg).toBe('404: topic does not exist')
+            })
+        });
+        test('status: 200, should return an empty array if the topic exists in the database but has no associated articles', () => {
+            return request(app).get('/api/articles?topic=paper').expect(200).then(({body:{articles}})=>{
+                expect(articles.length).toBe(0);
+            })
         });
     });
   });
@@ -284,7 +320,7 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("400: bad request");
         });
     });
-    test("status: 400, should return error message when there is details/data missing from the comment being posted", () => {
+    test("status: 422, should return error message when there is details/data missing from the comment being posted", () => {
       const newComment = {};
       return request(app)
         .post("/api/articles/1/comments")
