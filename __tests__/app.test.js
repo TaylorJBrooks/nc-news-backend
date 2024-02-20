@@ -91,6 +91,7 @@ describe("/api/articles/:article_id", () => {
         });
     });
   });
+
   describe("PATCH", () => {
     test("status: 200, should respond with the updated article", () => {
       const patchData = { inc_votes: 1 };
@@ -309,4 +310,22 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
   });
+});
+
+describe('/api/comments/:comment_id', () => {
+    describe('DELETE', () => {
+        test('status: 204, deletes the specified comment and returns no response body back', () => {
+            return request(app).delete('/api/comments/1').expect(204);
+        });
+        test('status: 400, returns error message if given an invalid comment_id', () => {
+            return request(app).delete('/api/comments/not-an-id').expect(400).then(({body:{msg}})=>{
+                expect(msg).toBe('400: bad request')
+            });
+        });
+        test('status: 404, returns error message when given a valid but non-existent comment id', () => {
+            return request(app).delete('/api/comments/1000').expect(404).then(({body:{msg}})=>{
+                expect(msg).toBe('404: comment does not exist')
+            });
+        });
+    });
 });
