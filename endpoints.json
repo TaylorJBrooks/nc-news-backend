@@ -71,7 +71,7 @@
     }
   },
   "POST /api/articles/:article_id/comments": {
-    "description": "posts the given comment to the database and responds with the posted comment",
+    "description": "posts the given comment to the database and responds with the posted comment, comment to be posted has to include a username and body",
     "queries": [],
     "exampleResponse": {
       "comment": {
@@ -81,6 +81,22 @@
           "author": "butter_bridge",
           "article_id": 9,
           "created_at": "2020-04-06 13:17:00"
+      }
+    }
+  },
+  "PATCH /api/article/:article_id": {
+    "description": "updates the given article with an increase or decrease in votes, according to the given object { inc_votes: newVote }, where newVote represents how much the votes property should be updated by",
+    "queries": [],
+    "exampleResponse":{
+      "article":{
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": 1594329060000,
+        "votes": 100,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
     }
   }

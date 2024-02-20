@@ -91,6 +91,67 @@ describe("/api/articles/:article_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("status: 200, should respond with the updated article", () => {
+      const patchData = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(patchData)
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article.author).toBe("butter_bridge");
+          expect(article.title).toBe("Living in the shadow of a great man");
+          expect(article.article_id).toBe(1);
+          expect(article.body).toBe("I find this existence challenging");
+          expect(article.topic).toBe("mitch");
+          expect(typeof article.created_at).toBe("string");
+          expect(article.votes).toBe(101);
+          expect(article.article_img_url).toBe(
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          );
+        });
+    });
+    test('status: 404, should return an error message when given a valid but non-existent article id', () => {
+        const patchData = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/1000")
+        .send(patchData)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+            expect(msg).toBe("404: article does not exist");
+          });
+    });
+    test('status: 400, should return error message when given an invalid article id', () => {
+        const patchData = { inc_votes: 1 };
+        return request(app)
+        .patch("/api/articles/not-an-id")
+        .send(patchData)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+            expect(msg).toBe("400: bad request");
+          });
+    });
+    test('status: 400, should return error message when the value of inc_votes is invalid', () => {
+        const patchData = { inc_votes: 'invalid value' };
+        return request(app)
+        .patch("/api/articles/1")
+        .send(patchData)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+            expect(msg).toBe("400: bad request");
+          });
+    });
+    test('status: 422, should return error message if not given inc_votes', () => {
+        const patchData = {};
+        return request(app)
+        .patch("/api/articles/1")
+        .send(patchData)
+        .expect(422)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("422: required data missing");
+        });
+    });
+  });
 });
 
 describe("/api/articles", () => {
@@ -168,14 +229,17 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
     test("status: 200, should return 200 status code when given an article id that exists but has no associated comments", () => {
-      return request(app).get("/api/articles/2/comments").expect(200).then(({body:{comments}})=>{
-        expect(comments.length).toBe(0);
-      });
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments.length).toBe(0);
+        });
     });
   });
 
   describe("POST", () => {
-    test("status: 200, should add a comment for a given article", () => {
+    test("status: 201, should add a comment for a given article", () => {
       const newComment = {
         body: "post new comment test",
         username: "butter_bridge",
