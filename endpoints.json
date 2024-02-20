@@ -118,5 +118,15 @@
         }
       ]
     }
+  },
+  "GET /api/topics/:topic_name": {
+    "description":"serves an object of the requested topic by name (a.k.a slug)",
+    "queries":[],
+    "exampleResponse": {
+      "topic":{
+        "slug": "mitch",
+        "description": "The man, the Mitch, the legend"
+      }
+    }
   }
 }
