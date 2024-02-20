@@ -168,4 +168,19 @@ describe("/api/articles/:article_id/comments", () => {
           });
       });
   });
+  describe('POST', () => {
+    test('status: 200, should add a comment for a given article', () => {
+        const newComment = {
+            body: "post new comment test",
+            username: 'butter_bridge'
+          }
+        return request(app).post('/api/articles/1/comments').send(newComment).expect(201).then(({body:{comment}})=>{
+            expect(comment.body).toBe("post new comment test")
+            expect(comment.author).toBe('butter_bridge')
+            expect(comment.votes).toBe(0)
+            expect(comment.article_id).toBe(1)
+            expect(typeof comment.created_at).toBe('string')
+        })
+    });
+  });
 });
