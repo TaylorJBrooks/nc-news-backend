@@ -1,6 +1,6 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics-controllers');
-const { pathNotFound, customError, badRequest } = require('./error-handling');
+const { pathNotFound, customError, badRequest } = require('./controllers/errors-controllers');
 const { getApi } = require('./controllers/api-controllers');
 const { getArticleById, getAllArticles } = require('./controllers/articles-controllers');
 const { getCommentsByArticleId, postComment } = require('./controllers/comments-controllers');
@@ -23,7 +23,7 @@ app.use(badRequest);
 
 app.use((error, req, res, next)=>{
     console.log(error);
-    response.status(500).send({msg: "Internal server error!"})
+    response.status(500).send({msg: "throwing error"})
 })
 
 module.exports = app;

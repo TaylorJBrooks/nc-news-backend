@@ -167,6 +167,11 @@ describe("/api/articles/:article_id/comments", () => {
             expect(msg).toBe("400: bad request");
           });
       });
+    test('status: 204, should return 204 status code when given an article id that exists but has no associated comments', () => {
+        return request(app)
+        .get("/api/articles/2/comments")
+        .expect(204)
+    });
   });
   describe('POST', () => {
     test('status: 200, should add a comment for a given article', () => {
