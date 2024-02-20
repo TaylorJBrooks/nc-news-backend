@@ -167,8 +167,10 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("400: bad request");
         });
     });
-    test("status: 204, should return 204 status code when given an article id that exists but has no associated comments", () => {
-      return request(app).get("/api/articles/2/comments").expect(204);
+    test("status: 200, should return 200 status code when given an article id that exists but has no associated comments", () => {
+      return request(app).get("/api/articles/2/comments").expect(200).then(({body:{comments}})=>{
+        expect(comments.length).toBe(0);
+      });
     });
   });
 
@@ -217,7 +219,7 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("400: bad request");
         });
     });
-    test.only("status: 400, should return error message when there is details/data missing from the comment being posted", () => {
+    test("status: 400, should return error message when there is details/data missing from the comment being posted", () => {
       const newComment = {};
       return request(app)
         .post("/api/articles/1/comments")

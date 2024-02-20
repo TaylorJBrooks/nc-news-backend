@@ -7,10 +7,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
 
     Promise.all(promises).then((promisesReturned)=>{
         const comments = promisesReturned[0];
-        if(comments.length === 0){
-            res.sendStatus(204);    
-        }
-        else res.status(200).send({comments});
+        res.status(200).send({comments});
     }).catch((error)=>{
         next(error);
     })
