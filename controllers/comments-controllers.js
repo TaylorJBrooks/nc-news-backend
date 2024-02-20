@@ -1,5 +1,5 @@
 const { selectArticleById } = require("../models/articles-models");
-const { selectCommentsByArticleId, insertComment } = require("../models/comments-models");
+const { selectCommentsByArticleId, insertComment, deleteCommentFromDB } = require("../models/comments-models");
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params;
@@ -23,3 +23,12 @@ exports.postComment = (req, res, next) => {
         next(error);
     })
 };
+
+exports.deleteComment = (req, res, next) => {
+    const {comment_id} = req.params;
+    deleteCommentFromDB(comment_id).then(()=>{
+        res.sendStatus(204);
+    }).catch((error)=>{
+        next(error);
+    })
+}
