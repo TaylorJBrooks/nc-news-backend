@@ -143,34 +143,106 @@ describe("/api/articles/:article_id/comments", () => {
           });
         });
     });
-    test('should be sorted by default in descending order by the created_at values', () => {
-        return request(app)
+    test("should be sorted by default in descending order by the created_at values", () => {
+      return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body: { comments } }) => {
-            expect(comments).toBeSortedBy('created_at', {descending: true});
-        })
+          expect(comments).toBeSortedBy("created_at", { descending: true });
+        });
     });
     test("status: 404, should return error message when given a valid but non-existent article id", () => {
-        return request(app)
-          .get("/api/articles/1000/comments")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe("404: article does not exist");
-          });
-      });
+      return request(app)
+        .get("/api/articles/1000/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("404: article does not exist");
+        });
+    });
     test("status: 400, should return error message when given an invalid article id", () => {
-        return request(app)
-          .get("/api/articles/not-an-id/comments")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe("400: bad request");
-          });
+      return request(app)
+        .get("/api/articles/not-an-id/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400: bad request");
+        });
+    });
+    test("status: 200, should return 200 status code when given an article id that exists but has no associated comments", () => {
+      return request(app).get("/api/articles/2/comments").expect(200).then(({body:{comments}})=>{
+        expect(comments.length).toBe(0);
       });
-    test('status: 204, should return 204 status code when given an article id that exists but has no associated comments', () => {
-        return request(app)
-        .get("/api/articles/2/comments")
-        .expect(204)
+    });
+  });
+
+  describe("POST", () => {
+    test("status: 200, should add a comment for a given article", () => {
+      const newComment = {
+        body: "post new comment test",
+        username: "butter_bridge",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body: { comment } }) => {
+          expect(comment.body).toBe("post new comment test");
+          expect(comment.author).toBe("butter_bridge");
+          expect(comment.votes).toBe(0);
+          expect(comment.article_id).toBe(1);
+          expect(comment.comment_id).toBe(19);
+          expect(typeof comment.created_at).toBe("string");
+        });
+    });
+    test("status: 404, should return error message when given a valid but non-existent article id", () => {
+      const newComment = {
+        body: "post new comment test",
+        username: "butter_bridge",
+      };
+      return request(app)
+        .post("/api/articles/1000/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("404: article does not exist");
+        });
+    });
+    test("status: 400, should return error message when given an invalid article id", () => {
+      const newComment = {
+        body: "post new comment test",
+        username: "butter_bridge",
+      };
+      return request(app)
+        .post("/api/articles/not-an-id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400: bad request");
+        });
+    });
+    test("status: 400, should return error message when there is details/data missing from the comment being posted", () => {
+      const newComment = {};
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(422)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("422: required data missing");
+        });
+    });
+    test("status: 422, username does not belong to a registered user", () => {
+      const newComment = {
+        body: "post new comment test",
+        username: "test_user",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(422)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe(
+            "422: username does not belong to a registered user"
+          );
+        });
     });
   });
 });
