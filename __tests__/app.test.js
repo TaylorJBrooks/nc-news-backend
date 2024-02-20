@@ -106,6 +106,14 @@ describe("/api/articles/:article_id", () => {
           expect(msg).toBe("400: bad request");
         });
     });
+    test('status: 200, the article object should also include a comment_count property', () => {
+        return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({body:{article}})=>{
+            expect(article.comment_count).toBe(11)
+        })
+    });
   });
 
   describe("PATCH", () => {
