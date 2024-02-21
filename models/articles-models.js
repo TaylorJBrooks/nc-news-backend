@@ -60,8 +60,7 @@ exports.selectArticles = (topic, sort_by='created_at', order='desc') => {
 
 exports.updateArticleById = (article_id, inc_votes) => {
   return db
-    .query(
-      `
+    .query( `
     UPDATE articles
     SET votes = votes + $1
     WHERE article_id = $2
