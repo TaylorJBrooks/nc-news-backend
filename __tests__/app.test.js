@@ -200,7 +200,7 @@ describe("/api/articles", () => {
           });
         });
     });
-    test("should be sorted by default in descending order by date", () => {
+    test("should be sorted by default in descending order by created_at date", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -225,6 +225,35 @@ describe("/api/articles", () => {
         test('status: 200, should return an empty array if the topic exists in the database but has no associated articles', () => {
             return request(app).get('/api/articles?topic=paper').expect(200).then(({body:{articles}})=>{
                 expect(articles.length).toBe(0);
+            })
+        });
+    });
+    describe('sort_by query', () => {
+        test('status: 200, should be able to be sorted by any valid given column, descending is default', () => {
+            return request(app).get("/api/articles?sort_by=title")
+            .expect(200).then(({body:{articles}})=>{
+                expect(articles).toBeSortedBy('title', {descending:true})
+            })
+        });
+        test('status: 400, should return error message when given a sort_by value that is not greenlisted', () => {
+            return request(app).get("/api/articles?sort_by=not-valid-value")
+            .expect(400).then(({body:{msg}})=>{
+                expect(msg).toBe('400: bad request');
+            })
+        });
+    });
+
+    describe('order query', () => {
+        test('status: 200, should be able to take an order query of asc/desc (desc is default), sort_by is set to created_at by default', () => {
+            return request(app).get("/api/articles?order=asc")
+            .expect(200).then(({body:{articles}})=>{
+                expect(articles).toBeSortedBy('created_at', {descending:false})
+            })
+        });
+        test('status: 400, should return error message when given an order value that is not greenlisted', () => {
+            return request(app).get("/api/articles?order=not-valid-value")
+            .expect(400).then(({body:{msg}})=>{
+                expect(msg).toBe('400: bad request')
             })
         });
     });
