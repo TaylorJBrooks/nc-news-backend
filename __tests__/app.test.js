@@ -18,6 +18,26 @@ describe("unavailable path", () => {
   });
 });
 
+describe("/api", () => {
+  describe("GET", () => {
+    test("status 200: should return an object detailing all available endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body: { endpoints } }) => {
+          expect(typeof endpoints).toBe("object");
+          expect(Array.isArray(endpoints)).not.toBe(true);
+          for (const key in endpoints) {
+            const endpoint = endpoints[key];
+            expect(typeof endpoint.description).toBe("string");
+            expect(Array.isArray(endpoint.queries)).toBe(true);
+            expect(typeof endpoint.exampleResponse).toBe("object");
+          }
+        });
+    });
+  });
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
     test("status 200: should return an array of topic objects", () => {
@@ -51,25 +71,86 @@ describe('/api/topics/:topic_name', () => {
     });
 });
 
-describe("/api", () => {
-  describe("GET", () => {
-    test("status 200: should return an object detailing all available endpoints", () => {
-      return request(app)
-        .get("/api")
-        .expect(200)
-        .then(({ body: { endpoints } }) => {
-          expect(typeof endpoints).toBe("object");
-          expect(Array.isArray(endpoints)).not.toBe(true);
-          for (const key in endpoints) {
-            const endpoint = endpoints[key];
-            expect(typeof endpoint.description).toBe("string");
-            expect(Array.isArray(endpoint.queries)).toBe(true);
-            expect(typeof endpoint.exampleResponse).toBe("object");
-          }
-        });
+describe("/api/articles", () => {
+    describe("GET", () => {
+      test("status: 200, should return an array of article objects", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).toBe(13);
+            articles.forEach((article) => {
+              expect(typeof article.author).toBe("string");
+              expect(typeof article.title).toBe("string");
+              expect(typeof article.article_id).toBe("number");
+              expect(typeof article.topic).toBe("string");
+              expect(typeof article.created_at).toBe("string");
+              expect(typeof article.votes).toBe("number");
+              expect(typeof article.article_img_url).toBe("string");
+              expect(typeof article.comment_count).toBe("number");
+              expect(article.body).toBe(undefined);
+            });
+          });
+      });
+      test("should be sorted by default in descending order by created_at date", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+      describe('topic query', () => {
+          test('status: 200, given a topic query should return articles of only that given topic', ()=>{
+              return request(app).get('/api/articles?topic=cats').expect(200).then(({body:{articles}})=>{
+                  expect(articles.length).toBe(1)
+                  articles.forEach((article)=>{
+                      expect(article.topic).toBe('cats');
+                  })
+              })
+          });
+          test('status: 404, should return error message given a topic value that is not in the database', () => {
+              return request(app).get('/api/articles?topic=not-an-existing-topic').expect(404).then(({body:{msg}})=>{
+                  expect(msg).toBe('404: topic does not exist')
+              })
+          });
+          test('status: 200, should return an empty array if the topic exists in the database but has no associated articles', () => {
+              return request(app).get('/api/articles?topic=paper').expect(200).then(({body:{articles}})=>{
+                  expect(articles.length).toBe(0);
+              })
+          });
+      });
+      describe('sort_by query', () => {
+          test('status: 200, should be able to be sorted by any valid given column, descending is default', () => {
+              return request(app).get("/api/articles?sort_by=title")
+              .expect(200).then(({body:{articles}})=>{
+                  expect(articles).toBeSortedBy('title', {descending:true})
+              })
+          });
+          test('status: 400, should return error message when given a sort_by value that is not greenlisted', () => {
+              return request(app).get("/api/articles?sort_by=not-valid-value")
+              .expect(400).then(({body:{msg}})=>{
+                  expect(msg).toBe('400: bad request');
+              })
+          });
+      });
+  
+      describe('order query', () => {
+          test('status: 200, should be able to take an order query of asc/desc (desc is default), sort_by is set to created_at by default', () => {
+              return request(app).get("/api/articles?order=asc")
+              .expect(200).then(({body:{articles}})=>{
+                  expect(articles).toBeSortedBy('created_at', {descending:false})
+              })
+          });
+          test('status: 400, should return error message when given an order value that is not greenlisted', () => {
+              return request(app).get("/api/articles?order=not-valid-value")
+              .expect(400).then(({body:{msg}})=>{
+                  expect(msg).toBe('400: bad request')
+              })
+          });
+      });
     });
   });
-});
 
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
@@ -174,87 +255,6 @@ describe("/api/articles/:article_id", () => {
         .expect(422)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("422: required data missing");
-        });
-    });
-  });
-});
-
-describe("/api/articles", () => {
-  describe("GET", () => {
-    test("status: 200, should return an array of article objects", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(13);
-          articles.forEach((article) => {
-            expect(typeof article.author).toBe("string");
-            expect(typeof article.title).toBe("string");
-            expect(typeof article.article_id).toBe("number");
-            expect(typeof article.topic).toBe("string");
-            expect(typeof article.created_at).toBe("string");
-            expect(typeof article.votes).toBe("number");
-            expect(typeof article.article_img_url).toBe("string");
-            expect(typeof article.comment_count).toBe("number");
-            expect(article.body).toBe(undefined);
-          });
-        });
-    });
-    test("should be sorted by default in descending order by created_at date", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-        });
-    });
-    describe('topic query', () => {
-        test('status: 200, given a topic query should return articles of only that given topic', ()=>{
-            return request(app).get('/api/articles?topic=cats').expect(200).then(({body:{articles}})=>{
-                expect(articles.length).toBe(1)
-                articles.forEach((article)=>{
-                    expect(article.topic).toBe('cats');
-                })
-            })
-        });
-        test('status: 404, should return error message given a topic value that is not in the database', () => {
-            return request(app).get('/api/articles?topic=not-an-existing-topic').expect(404).then(({body:{msg}})=>{
-                expect(msg).toBe('404: topic does not exist')
-            })
-        });
-        test('status: 200, should return an empty array if the topic exists in the database but has no associated articles', () => {
-            return request(app).get('/api/articles?topic=paper').expect(200).then(({body:{articles}})=>{
-                expect(articles.length).toBe(0);
-            })
-        });
-    });
-    describe('sort_by query', () => {
-        test('status: 200, should be able to be sorted by any valid given column, descending is default', () => {
-            return request(app).get("/api/articles?sort_by=title")
-            .expect(200).then(({body:{articles}})=>{
-                expect(articles).toBeSortedBy('title', {descending:true})
-            })
-        });
-        test('status: 400, should return error message when given a sort_by value that is not greenlisted', () => {
-            return request(app).get("/api/articles?sort_by=not-valid-value")
-            .expect(400).then(({body:{msg}})=>{
-                expect(msg).toBe('400: bad request');
-            })
-        });
-    });
-
-    describe('order query', () => {
-        test('status: 200, should be able to take an order query of asc/desc (desc is default), sort_by is set to created_at by default', () => {
-            return request(app).get("/api/articles?order=asc")
-            .expect(200).then(({body:{articles}})=>{
-                expect(articles).toBeSortedBy('created_at', {descending:false})
-            })
-        });
-        test('status: 400, should return error message when given an order value that is not greenlisted', () => {
-            return request(app).get("/api/articles?order=not-valid-value")
-            .expect(400).then(({body:{msg}})=>{
-                expect(msg).toBe('400: bad request')
-            })
         });
     });
   });
@@ -417,3 +417,21 @@ describe('/api/users', () => {
         });
     });
 });
+
+describe('/api/users/:username', () => {
+    describe('GET', () => {
+        test('status:200, should return user object, given username', () => {
+            return request(app).get('/api/users/butter_bridge').expect(200).then(({body:{user}})=>{
+                expect(user.username).toBe('butter_bridge')
+                expect(user.avatar_url).toBe('https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg')
+                expect(user.name).toBe('jonny')
+            })
+        });
+        test('status: 404, should return error message when given a non-existent username', () => {
+            return request(app).get('/api/users/not-a-username').expect(404).then(({body:{msg}})=>{
+                expect(msg).toBe('404: user does not exist');
+            })
+        });
+    });
+});
+
