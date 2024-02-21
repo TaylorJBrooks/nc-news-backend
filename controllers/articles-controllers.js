@@ -1,4 +1,4 @@
-const { selectArticleById, selectArticles, updateArticleById } = require("../models/articles-models");
+const { selectArticleById, selectArticles, updateArticleById, insertArticle } = require("../models/articles-models");
 const { selectTopicBySlug } = require("../models/topics-models");
 
 exports.getArticleById = (req, res, next) => {
@@ -36,3 +36,15 @@ exports.patchArticleById = (req, res, next) => {
         next(error);
     })
 };
+
+exports.postArticle = (req, res, next) => {
+    const newArticle = req.body
+    insertArticle(newArticle).then((insertedArticle)=>{
+        const {article_id} = insertedArticle;
+        return selectArticleById(article_id)
+    }).then((article)=>{
+        res.status(201).send({article})
+    }).catch((err)=>{
+        next(err)
+    })
+}

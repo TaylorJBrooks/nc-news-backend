@@ -20,9 +20,14 @@ exports.badRequest = (err, req, res, next) => {
 exports.violatesForeignKeyConstraint = (err, req, res, next) => {
     if(err.code === '23503' && err.constraint === 'comments_article_id_fkey') {
         res.status(404).send({msg: "404: article does not exist"})
-    } 
+    } else if(err.code === '23503' && err.constraint === 'articles_topic_fkey'){
+        res.status(404).send({msg: '404: topic does not exist'})
+    }
     else if(err.code === '23503' && err.constraint === 'comments_author_fkey'){
         res.status(422).send({msg: '422: username does not belong to a registered user'})
+    }
+    else if(err.code === '23503' && err.constraint === 'articles_author_fkey'){
+        res.status(422).send({msg: '422: author is not a registered user'})
     }
     else next(err);
 };
