@@ -142,5 +142,20 @@
             "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
     }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the given comment with an increase or decrease in votes, according to the given object { inc_votes: newVote }, where newVote represents how much the votes property should be updated by",
+    "queries":[],
+    "exampleResponse":{
+      "comment":
+        {
+          "comment_id": 1,
+          "body":"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          "article_id":9,
+          "author":"butter_bridge",
+          "votes":17,
+          "created_at":"2020-04-06 13:17:00"
+        }
+    }
   }
 }

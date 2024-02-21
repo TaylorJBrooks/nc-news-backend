@@ -3,7 +3,7 @@ const { getTopics, getTopicByName } = require('./controllers/topics-controllers'
 const { pathNotFound, customError, badRequest, violatesForeignKeyConstraint, violatesNotNullConstraint } = require('./controllers/errors-controllers');
 const { getApi } = require('./controllers/api-controllers');
 const { getArticleById, getArticles, patchArticleById } = require('./controllers/articles-controllers');
-const { getCommentsByArticleId, postComment, deleteComment } = require('./controllers/comments-controllers');
+const { getCommentsByArticleId, postComment, deleteComment, patchComment } = require('./controllers/comments-controllers');
 const { getAllUsers, getUserByUsername } = require('./controllers/users-controllers');
 const app = express();
 
@@ -27,6 +27,7 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 app.post('/api/articles/:article_id/comments', postComment);
 
 app.delete('/api/comments/:comment_id', deleteComment)
+app.patch('/api/comments/:comment_id', patchComment)
 
 app.all('/*', pathNotFound);
 app.use(customError);

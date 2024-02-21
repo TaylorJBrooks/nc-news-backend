@@ -401,6 +401,43 @@ describe('/api/comments/:comment_id', () => {
             });
         });
     });
+    describe('PATCH', () => {
+        test("status: 200, updates the votes on a comment given the comment's comment_id, should return the updated comment", () => {
+            const patchData = {inc_votes: 1}
+            return request(app).patch('/api/comments/1').send(patchData).expect(200).then(({body: {comment}})=>{
+                expect(comment.comment_id).toBe(1);
+                expect(typeof comment.created_at).toBe("string");
+                expect(comment.author).toBe("butter_bridge");
+                expect(comment.body).toBe("Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!");
+                expect(comment.article_id).toBe(9);
+                expect(comment.votes).toBe(17);
+            })
+        });
+        test('status: 404, should return error message when given a valid but non-existent comment_id', () => {
+            const patchData = {inc_votes: 1}
+            return request(app).patch('/api/comments/1000').send(patchData).expect(404).then(({body: {msg}})=>{
+                expect(msg).toBe('404: comment does not exist')
+            })
+        });
+        test('status: 400, should return error message when given an invalid comment_id', () => {
+            const patchData = {inc_votes: 1}
+            return request(app).patch('/api/comments/not-an-id').send(patchData).expect(400).then(({body: {msg}})=>{
+                expect(msg).toBe('400: bad request')
+            })
+        });
+        test('status: 400, should return error message when the value of inc_votes is invalid', () => {
+            const patchData = {inc_votes: 'invalid value'}
+            return request(app).patch('/api/comments/1').send(patchData).expect(400).then(({body: {msg}})=>{
+                expect(msg).toBe('400: bad request')
+            })
+        });
+        test('status: 422, should return error message when not passed inc_votes', () => {
+            const patchData = {not_inc_votes: 1}
+            return request(app).patch('/api/comments/1').send(patchData).expect(422).then(({body: {msg}})=>{
+                expect(msg).toBe('422: required data missing')
+            })
+        });
+    });
 });
 
 describe('/api/users', () => {
