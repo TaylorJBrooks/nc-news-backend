@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTopics, getTopicByName } = require('./controllers/topics-controllers');
+const { getTopics, getTopicByName, postTopic } = require('./controllers/topics-controllers');
 const { pathNotFound, customError, badRequest, violatesForeignKeyConstraint, violatesNotNullConstraint } = require('./controllers/errors-controllers');
 const { getApi } = require('./controllers/api-controllers');
 const { getArticleById, getArticles, patchArticleById, postArticle } = require('./controllers/articles-controllers');
@@ -12,6 +12,7 @@ app.use(express.json());
 app.get('/api', getApi);
 
 app.get('/api/topics', getTopics);
+app.post('/api/topics', postTopic);
 
 app.get('/api/topics/:topic_name', getTopicByName);
 

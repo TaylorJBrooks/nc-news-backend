@@ -159,7 +159,7 @@
     }
   },
   "POST /api/articles": {
-    "description": "posts the given article to the database and responds with the posted article, comment to be posted has to include author, body, title and topic, can also take a value for article_img_url but not required",
+    "description": "posts the given article to the database and responds with the posted article, article to be posted has to include author, body, title and topic, can also take a value for article_img_url but not required",
     "queries": [],
     "exampleResponse": {
       "article":{
@@ -171,6 +171,16 @@
         "created_at": 1594329060000,
         "votes": 100,
         "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "POST /api/topics": {
+    "description": "posts the given topic to the database and responds with the posted topic, topic to be posted has to include slug and description",
+    "queries": [],
+    "exampleResponse": {
+      "topic":{
+        "slug": "mitch",
+        "description": "I find this existence challenging"
       }
     }
   }

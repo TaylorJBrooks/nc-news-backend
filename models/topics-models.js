@@ -14,3 +14,12 @@ exports.selectTopicBySlug = (slug) => {
         return rows[0];
     })
 }
+
+exports.insertTopic = (slug, description) => {
+    if(!description){
+        return Promise.reject({status: 422, msg: '422: required data missing'})
+    }
+    return db.query(`INSERT INTO topics (slug, description) VALUES ($1, $2) RETURNING *`, [slug, description]).then(({rows})=>{
+        return rows[0];
+    })
+}

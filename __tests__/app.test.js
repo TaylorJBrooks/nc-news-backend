@@ -53,6 +53,34 @@ describe("/api/topics", () => {
         });
     });
   });
+  describe('POST', () => {
+    test('status: 201, should add the given topic to topics table and return the article', () => {
+      const newTopic = {
+        "slug": "topic name here",
+        "description": "description here"
+      }
+      return request(app).post('/api/topics').send(newTopic).expect(201).then(({body: {topic}})=>{
+        expect(topic.slug).toBe("topic name here"),
+        expect(topic.description).toBe('description here')
+      })
+    });
+    test('status: 422, should return error message if there is required slug value missing from the given topic (violates not null constraint)', () => {
+      const newTopic = {
+        "description": "description here"
+      }
+      return request(app).post('/api/topics').send(newTopic).expect(422).then(({body: {msg}})=>{
+        expect(msg).toBe('422: required data missing')
+      })
+    });
+    test('status: 422, should return error message if description value is missing', () => {
+      const newTopic = {
+        "slug": "topic name here"
+      }
+      return request(app).post('/api/topics').send(newTopic).expect(422).then(({body: {msg}})=>{
+        expect(msg).toBe('422: required data missing')
+      })
+    });
+  });
 });
 
 describe('/api/topics/:topic_name', () => {
