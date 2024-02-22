@@ -1,4 +1,5 @@
-const { selectArticleById, selectArticles, updateArticleById, insertArticle } = require("../models/articles-models");
+const { selectArticleById, selectArticles, updateArticleById, insertArticle, deleteArticleFromDB } = require("../models/articles-models");
+const { deleteCommentsByArticleId } = require("../models/comments-models");
 const { selectTopicBySlug } = require("../models/topics-models");
 
 exports.getArticleById = (req, res, next) => {
@@ -46,5 +47,16 @@ exports.postArticle = (req, res, next) => {
         res.status(201).send({article})
     }).catch((err)=>{
         next(err)
+    })
+}
+
+exports.deleteArticleById = (req, res, next) => {
+    const {article_id} = req.params
+    const promises = [deleteCommentsByArticleId(article_id), deleteArticleFromDB(article_id)]
+
+    Promise.all(promises).then(()=>{
+        res.sendStatus(204)
+    }).catch((err)=>{
+        next(err);
     })
 }

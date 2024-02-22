@@ -99,3 +99,12 @@ exports.insertArticle = (newArticle) => {
         return rows[0];
     })
 }
+
+exports.deleteArticleFromDB = (article_id) => {
+  return db.query(`DELETE FROM articles WHERE article_id = $1`, [article_id]).then(({rowCount})=>{
+    if(rowCount === 0){
+      return Promise.reject({status: 404, msg: '404: article does not exist'})
+    }
+    else return;
+  })
+}

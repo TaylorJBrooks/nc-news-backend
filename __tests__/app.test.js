@@ -349,6 +349,22 @@ describe("/api/articles/:article_id", () => {
         });
     });
   });
+
+  describe('DELETE', () => {
+    test('status: 204, deletes the specified article and returns no response body back', () => {
+      return request(app).delete('/api/articles/1').expect(204);
+    });
+    test('status: 400, returns error message if given an invalid article_id', () => {
+      return request(app).delete('/api/articles/not-an-id').expect(400).then(({body:{msg}})=>{
+        expect(msg).toBe('400: bad request');
+      })
+    });
+    test('status: 404, returns error message if given a valid but non-existent article_id', () => {
+      return request(app).delete('/api/articles/1000').expect(404).then(({body:{msg}})=>{
+        expect(msg).toBe('404: article does not exist');
+      })
+    });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {

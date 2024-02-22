@@ -183,5 +183,10 @@
         "description": "I find this existence challenging"
       }
     }
+  },
+  "DELETE /api/articles/article_id": {
+    "description": "deletes the article by the given id from the database and its respective comments, does not return a response",
+    "queries": [],
+    "exampleResponse": {"n/a": "n/a"}
   }
 }
