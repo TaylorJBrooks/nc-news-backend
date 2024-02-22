@@ -12,8 +12,8 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const { topic, sort_by, order } = req.query;
-    const promises = [selectArticles(topic, sort_by, order)]
+    const { topic, sort_by, order, limit, p} = req.query;
+    const promises = [selectArticles(topic, sort_by, order, limit, p)]
 
     if(topic){
         promises.push(selectTopicBySlug(topic))
@@ -21,7 +21,7 @@ exports.getArticles = (req, res, next) => {
 
     Promise.all(promises).then((promisesResults)=>{
         const articles = promisesResults[0];
-        res.status(200).send({articles});
+        res.status(200).send(articles);
     }).catch((error)=>{
         next(error);
     })
