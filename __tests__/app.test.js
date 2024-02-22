@@ -177,6 +177,59 @@ describe("/api/articles", () => {
               })
           });
       });
+
+      describe('pagination', () => {
+        test('status: 200, should return only 10 articles given limit query, with no value', () => {
+          return request(app).get('/api/articles?limit').expect(200).then(({body:{articles}})=>{
+            expect(articles.length).toBe(10);
+          })
+        });
+        test('status: 200, should return remaining articles given p=2', () => {
+          return request(app).get('/api/articles?limit&p=2').expect(200).then(({body:{articles}})=>{
+            expect(articles.length).toBe(3);
+          })
+        });
+        test('status: 200, should return array of articles of the given limit length', () => {
+          return request(app).get('/api/articles?limit=5').expect(200).then(({body:{articles}})=>{
+            expect(articles.length).toBe(5);
+          })
+        });
+        test('status: 200, should return correct number of articles, given limit=5 and p=3', () => {
+          return request(app).get('/api/articles?limit=3&p=5').expect(200).then(({body:{articles}})=>{
+            expect(articles.length).toBe(1);
+          })
+        });
+        test('status: 400, should return error message given an invalid limit value', () => {
+          return request(app).get('/api/articles?limit=not-valid').expect(400).then(({body:{msg}})=>{
+            expect(msg).toBe('400: bad request');
+          })
+        });
+        test('status: 400, should return error message given an invalid p value', () => {
+          return request(app).get('/api/articles?limit=10&p=not-valid').expect(400).then(({body:{msg}})=>{
+            expect(msg).toBe('400: bad request');
+          })
+        });
+        test('status: 404, should return error message, given a p value greater than the number of articles', () => {
+          return request(app).get('/api/articles?limit=5&p=100').expect(404).then(({body:{msg}})=>{
+            expect(msg).toBe('404: no articles found');
+          })
+        });
+      });
+
+      describe('total_count', () => {
+        test('status: 200, the returned object containing the articles array should also contain a total count property', () => {
+          return request(app).get('/api/articles').expect(200).then(({body})=>{
+            expect(body.articles.length).toBe(13)
+            expect(body.total_count).toBe(13)
+          })
+        });
+        test('status: 200, total count should be correct given a limit value', () => {
+          return request(app).get('/api/articles?limit=5').expect(200).then(({body})=>{
+            expect(body.articles.length).toBe(5)
+            expect(body.total_count).toBe(13)
+          })
+        });
+      });
     });
     describe('POST', () => {
         test('status: 201, should add the given article to the articles table and return the article', () => {
