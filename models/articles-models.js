@@ -78,3 +78,24 @@ exports.updateArticleById = (article_id, inc_votes) => {
       return rows[0];
     });
 };
+
+exports.insertArticle = (newArticle) => {
+    const {title, topic, author, body, article_img_url} = newArticle;
+    const queries = [title, topic, author, body];
+    let queryString = `INSERT INTO articles `
+
+    if(article_img_url){
+        queryString += `(title, topic, author, body, article_img_url)
+        VALUES ($1, $2, $3, $4, $5) 
+        RETURNING *`
+        queries.push(article_img_url);
+    } else {
+        queryString += `(title, topic, author, body)
+        VALUES ($1, $2, $3, $4) 
+        RETURNING *`
+    }
+
+    return db.query(queryString, queries).then(({rows})=>{
+        return rows[0];
+    })
+}

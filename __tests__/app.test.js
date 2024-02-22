@@ -150,7 +150,70 @@ describe("/api/articles", () => {
           });
       });
     });
-  });
+    describe('POST', () => {
+        test('status: 201, should add the given article to the articles table and return the article', () => {
+            const newArticle = {
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+              };
+            return request(app).post('/api/articles').send(newArticle).expect(201).then(({body:{article}})=>{
+                expect(article.article_id).toBe(14)
+                expect(article.votes).toBe(0)
+                expect(typeof article.created_at).toBe('string')
+                expect(article.comment_count).toBe(0)
+
+                expect(article.title).toBe("Living in the shadow of a great man")
+                expect(article.topic).toBe("mitch")
+                expect(article.author).toBe("butter_bridge")
+                expect(article.body).toBe("I find this existence challenging")
+                expect(article.article_img_url).toBe("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700")
+            })
+        });
+        test('status: 201, should add the given article, with default article_im_url, when not given article_img_url', () => {
+            const newArticle = {
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging"
+              };
+            return request(app).post('/api/articles').send(newArticle).expect(201).then(({body:{article}})=>{
+                expect(article.article_img_url).toBe('https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700')
+            })
+        });
+        test('status: 422, should return error message if there is required data/details missing from the given article', () => {
+            const newArticle = { };
+            return request(app).post('/api/articles').send(newArticle).expect(422).then(({body:{msg}})=>{
+                expect(msg).toBe('422: required data missing')
+            })
+        });
+        test('status: 422, should return error message if the given author is not on the users table', () => {
+            const newArticle = {
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "not-a-user",
+                body: "I find this existence challenging"
+              };
+            return request(app).post('/api/articles').send(newArticle).expect(422).then(({body:{msg}})=>{
+                expect(msg).toBe('422: author is not a registered user')
+            })
+        });
+        test('status: 404, should return error message if the given topic is non-existent', () => {
+            const newArticle = {
+                title: "Living in the shadow of a great man",
+                topic: "not-a-topic",
+                author: "butter_bridge",
+                body: "I find this existence challenging"
+              };
+            return request(app).post('/api/articles').send(newArticle).expect(404).then(({body:{msg}})=>{
+                expect(msg).toBe('404: topic does not exist')
+            })
+        });
+    });
+});
 
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
