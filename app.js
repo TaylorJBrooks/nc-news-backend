@@ -2,7 +2,7 @@ const express = require('express');
 const { getTopics, getTopicByName, postTopic } = require('./controllers/topics-controllers');
 const { pathNotFound, customError, badRequest, violatesForeignKeyConstraint, violatesNotNullConstraint } = require('./controllers/errors-controllers');
 const { getApi } = require('./controllers/api-controllers');
-const { getArticleById, getArticles, patchArticleById, postArticle } = require('./controllers/articles-controllers');
+const { getArticleById, getArticles, patchArticleById, postArticle, deleteArticleById } = require('./controllers/articles-controllers');
 const { getCommentsByArticleId, postComment, deleteComment, patchComment } = require('./controllers/comments-controllers');
 const { getAllUsers, getUserByUsername } = require('./controllers/users-controllers');
 const app = express();
@@ -24,6 +24,7 @@ app.post('/api/articles', postArticle);
 
 app.get('/api/articles/:article_id', getArticleById);
 app.patch('/api/articles/:article_id', patchArticleById);
+app.delete('/api/articles/:article_id', deleteArticleById)
 
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 app.post('/api/articles/:article_id/comments', postComment);
