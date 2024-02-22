@@ -1,5 +1,5 @@
 exports.pathNotFound = (req, res, next) => {
-    res.status(404).send({msg: "404: path not found"});
+    res.status(404).send({msg: "404: path not found, visit the /api endpoint for all available endpoints"});
 };
 
 exports.customError = (err, req, res, next) => {

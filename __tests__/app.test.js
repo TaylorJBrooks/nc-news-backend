@@ -13,7 +13,7 @@ describe("unavailable path", () => {
       .get("/not-a-path")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("404: path not found");
+        expect(msg).toBe("404: path not found, visit the /api endpoint for all available endpoints");
       });
   });
 });
