@@ -41,5 +41,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install dependancies
         run: npm install
+      - name: Use PostgreSQL
+        uses: harmon758/postgresql-action@v1
       - name: Run tests
         run: DATABASE_URL=${{secrets.LIVE_DB_TEST_URL}} npm run test-app
