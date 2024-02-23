@@ -1,0 +1,34 @@
+name: Test
+on: 
+  pull_request: 
+    branches:
+      - main
+
+jobs:
+  test-utils:
+    name: test-utils
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install dependancies
+        run: npm install
+      - name: Run tests
+        run: npm run test-utils
+  test-app:
+    name: test-app
+    runs-on: ubuntu-latest
+    needs: test-utils
+    steps: 
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install dependancies
+        run: npm install
+      - name: Use PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql db: 'test_db'
+          postgresql user: 'test_user'
+          postgresql password: 'test_password'
+      - name: Run tests
+        run: PGDATABASE=test_db PGUSER=test_user PGPASSWORD=test_password npm run test-app
