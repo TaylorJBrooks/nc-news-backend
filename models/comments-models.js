@@ -1,8 +1,27 @@
-const db = require("../db/connection")
+const db = require("../db/connection");
+const { getLimit } = require("./utils");
 
-exports.selectCommentsByArticleId = (article_id) => {
+exports.selectCommentsByArticleId = (article_id, limit, page) => {
+    const limitData = getLimit(limit, page)
+
+    if(limitData === 'error'){
+        return Promise.reject({ status: 400, msg: "400: bad request" });
+    }
+
     return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [article_id]).then(({rows})=>{
-        return rows;
+        if(limitData === 'no limit'){
+            return rows;
+        }
+        const {numPerPage, offset} = limitData
+        const start = offset;
+        const end = offset + numPerPage;
+        const comments = [...rows].slice(start, end);
+        
+        if (rows.length !== 0 && comments.length === 0) {
+            return Promise.reject({ status: 404, msg: "404: no comments found" });
+        }
+
+        return comments;
     })
 };
 

@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { getLimit } = require("./utils");
 
 exports.selectArticleById = (article_id) => {
   const queryString = `
@@ -19,64 +20,6 @@ exports.selectArticleById = (article_id) => {
     return rows[0];
   });
 };
-
-//     const validSortBy = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url', 'comment_count'];
-//     const validOrder = ['asc', 'desc'];
-
-//     if(!validSortBy.includes(sort_by) || !validOrder.includes(order)){
-//         return Promise.reject({status: 400, msg: '400: bad request'})
-//     }
-
-//   let queryString = `SELECT
-//     articles.author,
-//     title,
-//     articles.article_id,
-//     topic,
-//     articles.created_at,
-//     articles.votes,
-//     article_img_url,
-//     COUNT(comment_id) ::INT AS comment_count
-//     FROM articles
-//     LEFT JOIN comments ON articles.article_id = comments.article_id `;
-
-//   const queries = [];
-
-//   if (topic) {
-//     queries.push(topic);
-//     queryString += ` WHERE topic = $${queries.length}`;
-//   }
-
-//   queryString += ` GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`
-
-//   let limitedQueryString = queryString
-
-//   const limits = []
-
-//   let numPerPage;
-
-//   if(limit === ''){
-//     numPerPage = 10;
-//     limitedQueryString += ` LIMIT 10`
-//   } else if (limit) {
-//     numPerPage = limit;
-//     limits.push(limit)
-//     limitedQueryString += ` LIMIT $${limits.length}`
-//   }
-
-//   if(page>1){
-//     const offset = numPerPage*(page-1)
-//     limits.push(offset);
-//     limitedQueryString += ` OFFSET $${limits.length}`
-//   }
-
-//   const promises = [db.query(queryString, queries), db.query(limitedQueryString, limits)]
-
-//   return Promise.all(promises).then((promisesResults) => {
-//     const articles = promisesResults[1].rows
-//     const unLimitedArticles = promisesResults[0].rows
-//     return {articles, total_count: unLimitedArticles.length}
-//   });
-// };
 
 exports.selectArticles = (
   topic,
@@ -122,41 +65,30 @@ exports.selectArticles = (
 
   queryString += ` GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
 
-  let numPerPage = 0;
+  const limitData = getLimit(limit, page)
 
-  if (limit === "") {
-    numPerPage += 10;
-  } else if (limit >= 0) {
-    numPerPage += limit * 1;
-  } else if (limit) {
-    return Promise.reject({ status: 400, msg: "400: bad request" });
-  }
-
-  let offset = 0;
-
-  if (page > 1) {
-    offset += numPerPage * (page - 1);
-  } else if (page === 1) {
-    offset += 0;
-  } else if (page) {
+  if(limitData === 'error'){
     return Promise.reject({ status: 400, msg: "400: bad request" });
   }
 
   return db.query(queryString, queries).then(({ rows }) => {
-    if (limit === "" || limit) {
-      const start = offset;
-      const end = offset + numPerPage;
-      const total_count = rows.length;
-      const articles = [...rows].slice(start, end);
-
-      if (total_count !== 0 && articles.length === 0) {
-        return Promise.reject({ status: 404, msg: "404: no articles found" });
-      }
-      
-      return { articles, total_count };
-    } else {
+    if(limitData === 'no limit'){
       return { articles: rows, total_count: rows.length };
     }
+
+    const {numPerPage, offset} = limitData
+
+    const start = offset;
+    const end = offset + numPerPage;
+    const total_count = rows.length;
+    const articles = [...rows].slice(start, end);
+
+    if (total_count !== 0 && articles.length === 0) {
+      return Promise.reject({ status: 404, msg: "404: no articles found" });
+    }
+    
+    return { articles, total_count };
+
   });
 };
 

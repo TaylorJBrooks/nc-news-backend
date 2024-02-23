@@ -3,6 +3,7 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
+const { getLimit } = require("../models/utils");
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -100,5 +101,36 @@ describe("formatComments", () => {
     const comments = [{ created_at: timestamp }];
     const formattedComments = formatComments(comments, {});
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
+  });
+});
+
+describe('getLimit', () => {
+  test('should return object with properties numPerPage and offset, given only a limit value', () => {
+    const actual = getLimit(5)
+    expect(actual).toEqual({numPerPage: 5, offset: 0})
+  });
+  test('should return correct object given both limit and page value', () => {
+    const actual = getLimit(5, 2)
+    expect(actual).toEqual({numPerPage: 5, offset: 5})
+  });
+  test('should return numPerPage of 10 given an empty string for limit', () => {
+    const actual = getLimit('')
+    expect(actual).toEqual({numPerPage:10, offset:0})
+  });
+  test('should be able to handle recieving the limit number as a string', () => {
+    const actual = getLimit('5')
+    expect(actual).toEqual({numPerPage:5, offset:0})
+  });
+  test('no limit: should return string of "no limit" if not given a limit value', () => {
+    const actual = getLimit()
+    expect(actual).toBe('no limit')
+  });
+  test('error: should return "error" if given an invalid limit value', () => {
+    const actual = getLimit('not-valid-limit')
+    expect(actual).toBe('error')
+  });
+  test('error: should return "error" if given invalid page value', () => {
+    const actual = getLimit(5, 'not-valid-page')
+    expect(actual).toBe('error')
   });
 });
