@@ -5,8 +5,7 @@ on:
       - main
 
 jobs:
-  test: 
-    name: test-utils
+  - name: test-utils
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
