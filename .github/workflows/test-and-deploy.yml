@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Install dependancies
-        run: npm 
+        run: npm install
       - name: Use PostgreSQL
         uses: harmon758/postgresql-action@v1
         with:
