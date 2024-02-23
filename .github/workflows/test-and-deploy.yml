@@ -1,0 +1,17 @@
+name: Test & Deploy
+on: 
+  push: 
+    branches:
+      - main
+
+jobs:
+  test: 
+    name: test-utils
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install dependancies
+        run: npm install
+      - name: Run tests
+        run: npm run test-utils
