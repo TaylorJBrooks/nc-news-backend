@@ -6,23 +6,22 @@ on:
 
 jobs:
   test:
-    name: test-utils
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Install dependancies
-        run: npm install
-      - name: Run tests
-        run: npm run test-utils
-  test:
-    name: test-app
-    runs-on: ubuntu-latest
-    needs: test-utils
-    steps: 
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Install dependancies
-        run: npm install
-      - name: Run tests
-        run: npm run test-app
+    - name: test-utils
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4
+        - name: Install dependancies
+          run: npm install
+        - name: Run tests
+          run: npm run test-utils
+    - name: test-app
+      runs-on: ubuntu-latest
+      needs: test-utils
+      steps: 
+        - name: Checkout repo
+          uses: actions/checkout@v4
+        - name: Install dependancies
+          run: npm install
+        - name: Run tests
+          run: npm run test-app
