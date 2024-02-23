@@ -27,8 +27,8 @@ jobs:
       - name: Use PostgreSQL
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql db: 'test_bd'
+          postgresql db: 'test_db'
           postgresql user: 'test_user'
           postgresql password: 'test_password'
       - name: Run tests
-        run: npm run test-app
+        run: PGDATABASE=test_db PGUSER=test_user PGPASSWORD=test_password npm run test-app
