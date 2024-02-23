@@ -1,7 +1,7 @@
-const { selectAllTopics, selectTopicBySlug, insertTopic } = require("../models/topics-models");
+const { selectTopics, selectTopicBySlug, insertTopic } = require("../models/topics-models");
 
 exports.getTopics = (req, res, next) => {
-    selectAllTopics().then((topics)=>{
+    selectTopics().then((topics)=>{
         res.status(200).send({topics});
     })
 };
