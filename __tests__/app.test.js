@@ -214,6 +214,11 @@ describe("/api/articles", () => {
             expect(msg).toBe('404: no articles found');
           })
         });
+        test('status: 404, should return error message, given a limit value of 0', () => {
+          return request(app).get('/api/articles?limit=0').expect(404).then(({body:{msg}})=>{
+            expect(msg).toBe('404: no articles found')
+          })
+        });
       });
 
       describe('total_count', () => {
@@ -469,6 +474,48 @@ describe("/api/articles/:article_id/comments", () => {
         .then(({ body: { comments } }) => {
           expect(comments.length).toBe(0);
         });
+    });
+    describe('pagination', () => {
+      test('status: 200, should return only 10 comments when given limit query but no value', () => {
+        return request(app).get('/api/articles/1/comments?limit').expect(200).then(({body:{comments}})=>{
+          expect(comments.length).toBe(10)
+        })
+      });
+      test('status: 200, should return remaining comments given p=2', () => {
+        return request(app).get('/api/articles/1/comments?limit&p=2').expect(200).then(({body:{comments}})=>{
+          expect(comments.length).toBe(1)
+        })
+      });
+      test('status: 200, should return array of comments of the given limit length', () => {
+        return request(app).get('/api/articles/1/comments?limit=5').expect(200).then(({body:{comments}})=>{
+          expect(comments.length).toBe(5)
+        })
+      });
+      test('status: 200, should return correct number of comments, given limit=5 and p=3', () => {
+        return request(app).get('/api/articles/1/comments?limit=5&p=3').expect(200).then(({body:{comments}})=>{
+          expect(comments.length).toBe(1)
+        })
+      });
+      test('status: 400, should return error message given an invalid limit value', () => {
+        return request(app).get('/api/articles/1/comments?limit=invalid-limit').expect(400).then(({body:{msg}})=>{
+          expect(msg).toBe('400: bad request')
+        })
+      });
+      test('status: 400, should return error message given an invalid p value', () => {
+        return request(app).get('/api/articles/1/comments?limit=5&p=invalid-p').expect(400).then(({body:{msg}})=>{
+          expect(msg).toBe('400: bad request')
+        })
+      });
+      test('status: 404, should return error message, given a p value greater than the number of articles', () => {
+        return request(app).get('/api/articles/1/comments?limit=5&p=100').expect(404).then(({body:{msg}})=>{
+          expect(msg).toBe('404: no comments found')
+        })
+      });
+      test('status: 404, should return error message, given a limit value of 0', () => {
+        return request(app).get('/api/articles/1/comments?limit=0').expect(404).then(({body:{msg}})=>{
+          expect(msg).toBe('404: no comments found')
+        })
+      });
     });
   });
 

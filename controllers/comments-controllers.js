@@ -3,7 +3,8 @@ const { selectCommentsByArticleId, insertComment, deleteCommentFromDB, updateCom
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params;
-    const promises = [selectCommentsByArticleId(article_id), selectArticleById(article_id)];
+    const {limit, p} = req.query
+    const promises = [selectCommentsByArticleId(article_id, limit, p), selectArticleById(article_id)];
 
     Promise.all(promises).then((promisesReturned)=>{
         const comments = promisesReturned[0];
