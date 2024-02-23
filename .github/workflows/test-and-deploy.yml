@@ -23,6 +23,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Install dependancies
-        run: npm install
+        run: npm 
+      - name: Use PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql db: 'test_bd'
+          postgresql user: 'test_user'
+          postgresql password: 'test_password'
       - name: Run tests
         run: npm run test-app
