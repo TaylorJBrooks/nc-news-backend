@@ -11,8 +11,7 @@
     "test-app": "jest app",
     "prepare": "husky install",
     "start": "node listen.js",
-    "seed-prod": "NODE_ENV=production npm run seed",
-    "seed-lt": "NODE_ENV=live-test npm run seed"
+    "seed-prod": "NODE_ENV=production npm run seed"
   },
   "repository": {
     "type": "git",

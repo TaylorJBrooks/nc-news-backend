@@ -1,4 +1,4 @@
-name: Test & Deploy
+name: Test
 on: 
   pull_request: 
     branches:
@@ -32,16 +32,3 @@ jobs:
           postgresql password: 'test_password'
       - name: Run tests
         run: PGDATABASE=test_db PGUSER=test_user PGPASSWORD=test_password npm run test-app
-  live-db-test:
-    name: live-db-test
-    runs-on: ubuntu-latest
-    needs: test-app
-    steps: 
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Install dependancies
-        run: npm install
-      - name: Use PostgreSQL
-        uses: harmon758/postgresql-action@v1
-      - name: Run tests
-        run: DATABASE_URL=${{secrets.LIVE_DB_TEST_URL}} npm run test-app
