@@ -14,8 +14,7 @@ app.use(violatesForeignKeyConstraint);
 app.use(violatesNotNullConstraint);
 
 app.use((error, req, res, next)=>{
-    console.log(error);
-    response.sendStatus(500).send({msg: "Internal Server Error"})
+    response.status(500).send({msg: "Internal Server Error"})
 })
 
 module.exports = app;
