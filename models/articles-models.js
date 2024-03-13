@@ -63,7 +63,11 @@ exports.selectArticles = (
     queryString += ` WHERE topic = $${queries.length}`;
   }
 
-  queryString += ` GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
+  if (sort_by === 'comment_count'){
+    queryString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
+  } else {
+    queryString += ` GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
+  }
 
   const limitData = getLimit(limit, page)
 

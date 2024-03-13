@@ -161,6 +161,12 @@ describe("/api/articles", () => {
                   expect(msg).toBe('400: bad request');
               })
           });
+          test('status: 200, should be able to be sorted by comment_count', () => {
+            return request(app).get("/api/articles?sort_by=comment_count")
+              .expect(200).then(({body:{articles}})=>{
+                  expect(articles).toBeSortedBy('comment_count', {descending:true})
+              })
+          });
       });
   
       describe('order query', () => {
