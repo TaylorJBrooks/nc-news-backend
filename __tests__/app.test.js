@@ -225,6 +225,11 @@ describe("/api/articles", () => {
             expect(msg).toBe('404: no articles found')
           })
         });
+        test('status: 200, should be able to correctly handle p=1', () => {
+          return request(app).get('/api/articles?p=1&limit=10').expect(200).then(({body:{articles}})=>{
+            expect(articles.length).toBe(10);
+          })
+        });
       });
 
       describe('total_count', () => {
