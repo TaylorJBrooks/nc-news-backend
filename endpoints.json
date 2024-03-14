@@ -70,7 +70,7 @@
       "topic",
       "sort_by: sort articles by any valid key, descending is default",
       "order: takes asc/desc",
-      "limit: limits number of articles returned, number of articles per page using p query",
+      "limit: limits number of articles returned, number of articles per page using p query (if only given limit with no value it defaults to 10)",
       "p: select page when using limit query"
     ],
     "exampleResponse": {

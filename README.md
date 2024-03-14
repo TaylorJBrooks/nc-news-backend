@@ -20,7 +20,7 @@ npm install
 3. Setup enviroment variables:
 
 This project uses two databases: one for dev data and the other for test data. 
-You will need to create two .env files for this repo: .env.test and .env.development. Into each, add PGDATABASE=, with the correct database name for that environment (see /db/setup.sql for the database names).
+You will need to create two .env files for this repo: `.env.test` and `.env.development`. Into each, add `PGDATABASE=`, with the correct database name for that environment (see /db/setup.sql for the database names).
 
 4. Setup databases:
 ```
