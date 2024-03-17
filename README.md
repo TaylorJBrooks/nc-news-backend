@@ -6,7 +6,7 @@ The API is built using Node.js and Express.js, with PostgreSQl serving as the da
 
 ## Live Demo
 
-You can access the live demo of the API hosted on Render [here](https://nc-news-97rk.onrender.com/).
+You can access the live demo of the API hosted on Render [here](https://nc-news-97rk.onrender.com/api).
 
 ## Endpoints
 
@@ -14,10 +14,10 @@ The API provides the following endpoints:
 
 - `/api/articles`: Allows users to retrieve a list of articles, post a new article, or search for articles by query.
 - `/api/articles/:article_id`: Allows users to retrieve a specific article by its ID, update an article's votes, or delete an article.
-- `/api/articles/:article_id/comments`: Allows users to retrieve comments for a specific article, post a new comment, or sort comments by votes.
-- `/api/comments/:comment_id`: Allows users to retrieve a specific comment by its ID, update a comment's votes, or delete a comment.
+- `/api/articles/:article_id/comments`: Allows users to retrieve comments for a specific article or post a new comment.
+- `/api/comments/:comment_id`: Allows users to update a comment's votes, or delete a comment.
 - `/api/topics`: Allows users to retrieve a list of topics or post a new topic.
-- `/api/users`: Allows users to retrieve a list of users or post a new user.
+- `/api/users`: Allows users to retrieve a list of users.
 - `/api/users/:username`: Allows users to retrieve a specific user by their username.
 
 ## Getting Started
